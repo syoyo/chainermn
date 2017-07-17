@@ -14,11 +14,24 @@ install_requires = [
     'mpi4py',
 ]
 
+ext_include_dirs = []
+ext_library_dirs = []
+if 'CUDA_HOME' in os.environ:
+    ext_include_dirs.append(os.path.join(os.environ['CUDA_HOME'], 'include'))
+    ext_library_dirs.append(os.path.join(os.environ['CUDA_HOME'], 'lib64'))
+
+if 'NCCL_ROOT' in os.environ:
+    ext_include_dirs.append(os.path.join(os.environ['NCCL_ROOT'], 'build/include'))
+    ext_library_dirs.append(os.path.join(os.environ['NCCL_ROOT'], 'build/lib'))
+
+
 ext_modules = [
     Extension(
         name='chainermn.nccl.nccl',
         sources=['chainermn/nccl/nccl.pyx'],
-        libraries=['nccl'])
+        libraries=['nccl'],
+        include_dirs=ext_include_dirs,
+        library_dirs=ext_library_dirs)
 ]
 
 if '--no-nccl' in sys.argv:
